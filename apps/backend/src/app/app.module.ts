@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PacientesModule } from './pacientes/pacientes.module';
+import { ExamesModule } from './exames/exames.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -9,8 +11,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
-      synchronize: true, // ⚠️ apenas para dev!
+      synchronize: true, // ⚠️dev!
     }),
+    PacientesModule,
+    ExamesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
