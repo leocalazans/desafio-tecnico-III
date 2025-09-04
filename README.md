@@ -1,107 +1,95 @@
-📝 **Task: Cadastro de Pacientes e Exames Médicos com Modalidades DICOM**
+# DesafioTecnico
 
-🎯 **Descrição**
+<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
 
-Como usuário da plataforma médica,  
-Quero registrar e consultar pacientes e seus exames de forma segura, consistente e com boa experiência de navegação,  
-Para que eu tenha controle sobre o histórico clínico mesmo em situações de reenvio de requisição ou acessos simultâneos.
+✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
 
-⸻
+Run `npx nx graph` to visually explore what got created. Now, let's get you up to speed!
 
-🔧 **Escopo da Task**
+## Run tasks
 
-- Implementar endpoints REST para cadastro e consulta de pacientes e exames.
-- Garantir idempotência no cadastro de exames.
-- Criar estrutura segura para suportar requisições concorrentes.
-- Implementar paginação para consultas.
-- Integrar com front-end Angular.
-- Criar componentes Angular para cadastro e listagem de pacientes e exames.
-- Utilizar práticas RESTful, transações ACID e código modular.
+To run tasks with Nx use:
 
-⸻
+```sh
+npx nx <target> <project-name>
+```
 
-✅ **Regras de Validações**
+For example:
 
-- O `documento` do paciente deve ser único.
-- A `idempotencyKey` do exame deve garantir que requisições duplicadas não criem múltiplos registros.
-- Não é permitido cadastrar exame para paciente inexistente.
-- Campos obrigatórios devem ser validados (nome, data de nascimento, modalidade, etc).
+```sh
+npx nx build myproject
+```
 
-⸻
+These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
 
-📦 **Saída Esperada**
+[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
-- Endpoints criados:
-  - `POST /pacientes`
-  - `GET /pacientes?page=x&pageSize=y`
-  - `POST /exames`
-  - `GET /exames?page=x&pageSize=y`
-- Dados persistidos de forma segura e idempotente.
-- Front-end com:
-  - Listagem paginada de pacientes e exames.
-  - Cadastro funcional via formulários.
-  - UI amigável com mensagens de erro e loading.
+## Add new projects
 
-⸻
+While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
 
-🔥 **Critérios de Aceite**
+To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
+```sh
+npx nx add @nx/react
+```
 
-- **Dado** que um paciente válido foi cadastrado,  
-  **Quando** for enviado um novo exame com `idempotencyKey` única,  
-  **Então** o exame deverá ser criado com sucesso.
+Use the plugin's generator to create new projects. For example, to create a new React app or library:
 
-- **Dado** que um exame com `idempotencyKey` já existe,  
-  **Quando** for enviada uma nova requisição com os mesmos dados,  
-  **Então** o sistema deverá retornar HTTP 200 com o mesmo exame, sem recriá-lo.
+```sh
+# Generate an app
+npx nx g @nx/react:app demo
 
-- **Dado** que múltiplas requisições simultâneas com mesma `idempotencyKey` são feitas,  
-  **Quando** processadas,  
-  **Então** apenas um exame deverá ser persistido.
+# Generate a library
+npx nx g @nx/react:lib some-lib
+```
 
-- **Dado** que o front-end está carregando dados,  
-  **Quando** houver erro de rede,  
-  **Então** deve ser exibida mensagem de erro com botão "Tentar novamente".
+You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
 
-⸻
+[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
-👥 **Dependências**
+## Set up CI!
 
-- Banco de dados com suporte a transações (PostgreSQL, MySQL ou similar).
-- Integração REST entre backend (Node.js/NestJS ou similar) e frontend (Angular).
-- Validação de campos no front-end e back-end.
-- Definição do enum de modalidades DICOM:
-  - `CR, CT, DX, MG, MR, NM, OT, PT, RF, US, XA`
+### Step 1
 
-⸻
+To connect to Nx Cloud, run the following command:
 
-🧪 **Cenários de Teste**
+```sh
+npx nx connect
+```
 
-| Cenário | Descrição | Resultado Esperado |
-|--------|-----------|--------------------|
-| 1 | Criar paciente com dados válidos | Paciente salvo com UUID único |
-| 2 | Criar paciente com CPF já existente | Erro de validação 409 - duplicidade |
-| 3 | Criar exame com paciente existente e idempotencyKey nova | HTTP 201 e exame salvo |
-| 4 | Reenviar exame com mesma idempotencyKey | HTTP 200 e retorno do mesmo exame |
-| 5 | Enviar múltiplas requisições simultâneas com mesma idempotencyKey | Apenas um exame persistido |
-| 6 | Criar exame com paciente inexistente | Erro 400 - paciente não encontrado |
-| 7 | Listar exames com paginação (10 por página) | Retorno paginado corretamente |
-| 8 | Listar pacientes com paginação | Lista retornada corretamente |
-| 9 | Frontend mostra loading durante chamada | Spinner visível enquanto carrega |
-| 10 | Frontend exibe erro de rede e botão “Tentar novamente” | Mensagem visível e reenvio possível |
-| 11 | Enviar exame com modalidade inválida | Erro 400 - enum inválido |
-| 12 | Validação visual dos campos obrigatórios no formulário | Campos com feedback de erro |
-| 13 | Cobertura mínima de 80% nos testes unitários e integração | Relatório de cobertura válido |
+Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
 
-⸻
+- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
-🧪 **Testes de Integração (Requisito Obrigatório)**
+### Step 2
 
-- Devem ser implementados utilizando ferramentas como:
-  - `Supertest` ou `jest` com `NestJS TestingModule` (backend)
-  - `TestBed`, `HttpClientTestingModule` (frontend Angular)
-- Devem cobrir pelo menos:
-  - Fluxo de criação completo (Paciente → Exame)
-  - Validações de regra de negócio
-  - Idempotência em requisições simultâneas
-  - Respostas corretas de erro
-  - Listagem paginada
+Use the following command to configure a CI workflow for your workspace:
+
+```sh
+npx nx g ci-workflow
+```
+
+[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+
+## Install Nx Console
+
+Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+
+[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+
+## Useful links
+
+Learn more:
+
+- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+
+And join the Nx community:
+- [Discord](https://go.nx.dev/community)
+- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
+- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
+- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
