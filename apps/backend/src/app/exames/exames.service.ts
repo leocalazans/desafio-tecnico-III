@@ -18,12 +18,19 @@ export class ExamesService {
 
   async create(dto: CreateExameDto): Promise<Exame> {
     return await this.dataSource.transaction(async (manager) => {
-      const paciente = await this.pacientesRepo.findOneBy({ id: dto.pacienteId });
+      // Paciente deve existir
+      const paciente = await manager.findOne(this.pacientesRepo.target, {
+        where: { id: dto.pacienteId },
+      });
       if (!paciente) throw new BadRequestException('Paciente não encontrado');
 
-      const existing = await this.examesRepo.findOneBy({ idempotencyKey: dto.idempotencyKey });
-      if (existing) return existing;
+      // Idempotência: verifica se exame já existe
+      const existing = await manager.findOne(this.examesRepo.target, {
+        where: { idempotencyKey: dto.idempotencyKey },
+      });
+      if (existing) return existing; // Retorna o mesmo exame sem recriar
 
+      // Criação do exame
       const exame = this.examesRepo.create({
         paciente,
         modalidade: dto.modalidade,
