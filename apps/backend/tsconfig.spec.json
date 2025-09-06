@@ -14,6 +14,8 @@
     "jest.config.ts",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "src/app/app.controller.spec.ts jjj",
+    "src/app/app.service"
   ]
 }

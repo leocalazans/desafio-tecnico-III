@@ -132,4 +132,20 @@ describe('ExamesService', () => {
       expect(res.data).toHaveLength(0);
     });
   });
+  describe('CreateExameDto', () => {
+    it('falha se campos obrigatórios estiverem faltando', async () => {
+      const dto = new CreateExameDto(); // vazio
+      const errors = await validate(dto);
+      expect(errors.length).toBeGreaterThan(0);
+    });
+
+    it('passa se dto for válido', async () => {
+      const dto = new CreateExameDto();
+      dto.pacienteId = '550e8400-e29b-41d4-a716-446655440000';
+      dto.modalidade = 'CT';
+      dto.idempotencyKey = 'k1';
+      const errors = await validate(dto);
+      expect(errors.length).toBe(0);
+    });
+  });
 });
