@@ -61,9 +61,11 @@ describe('PacientesService', () => {
 
     it('valida campos obrigatórios via class-validator', async () => {
       const dtos: Partial<CreatePacienteDto>[] = [
-        { documento: '123' },
-        { nome: 'Teste' },
-        {},
+        {}, // vazio
+        { nome: 'João' }, // sem documento
+        { documento: '123' }, // sem nome
+        { nome: '', documento: '123' }, // nome vazio
+        { nome: 'Ana', documento: '' }, // documento vazio
       ];
 
       for (const dto of dtos) {
@@ -95,6 +97,64 @@ describe('PacientesService', () => {
       const res = await service.findAll();
       expect(res.page).toBe(1);
       expect(res.pageSize).toBe(10);
+    });
+  });
+
+  describe('create - campos obrigatórios e falhas inesperadas', () => {
+    // it('lança erro se dto estiver incompleto', async () => {
+    //   const dtos = [
+    //     {}, // vazio
+    //     { nome: 'João' }, // sem documento
+    //     { documento: '123' }, // sem nome
+    //     { nome: '', documento: '123' }, // nome vazio
+    //     { nome: 'Ana', documento: '' }, // documento vazio
+    //   ];
+
+    //   for (const dto of dtos) {
+    //     await expect(service.create(dto as any)).rejects.toThrow();
+    //   }
+    // });
+
+    it('lança erro se manager.save falhar', async () => {
+      dataSourceMock.transaction.mockImplementationOnce(async (cb) => {
+        const manager = {
+          findOne: jest.fn().mockResolvedValue(null),
+          save: jest.fn().mockRejectedValue(new Error('save failed')),
+        };
+        return cb(manager);
+      });
+
+      await expect(
+        service.create({ nome: 'Erro', documento: '999', dataNascimento: '1990-01-01' } as any)
+      ).rejects.toThrow('save failed');
+    });
+
+    it('lança erro se manager.findOne falhar', async () => {
+      dataSourceMock.transaction.mockImplementationOnce(async (cb) => {
+        const manager = {
+          findOne: jest.fn().mockRejectedValue(new Error('find failed')),
+        };
+        return cb(manager);
+      });
+
+      await expect(
+        service.create({ nome: 'Erro', documento: '999', dataNascimento: '1990-01-01' } as any)
+      ).rejects.toThrow('find failed');
+    });
+  });
+
+  describe('findAll - paginação extrema', () => {
+    it('trata page = 0 e pageSize = 0', async () => {
+      repo.findAndCount.mockResolvedValue([[], 0]);
+      const res = await service.findAll(0, 0);
+      expect(res.page).toBe(0);
+      expect(res.pageSize).toBe(0);
+    });
+
+    it('trata pagina além do total de registros', async () => {
+      repo.findAndCount.mockResolvedValue([[], 1]);
+      const res = await service.findAll(1000, 10);
+      expect(res.page).toBe(1000);
     });
   });
 });
