@@ -2,7 +2,12 @@
   "name": "@mobilemed/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "test": "nx test backend",
+    "test:watch": "nx test backend --watch",
+    "test:coverage": "nx test backend --code-coverage",
+    "test:e2e": "nx test backend --testPathPattern=e2e-spec\\.ts$"
+  },
   "private": true,
   "dependencies": {
     "@angular/common": "~20.1.0",
@@ -56,6 +61,7 @@
     "@swc/helpers": "~0.5.11",
     "@types/jest": "^30.0.0",
     "@types/node": "20.19.9",
+    "@types/supertest": "^6.0.3",
     "@typescript-eslint/utils": "^8.29.0",
     "angular-eslint": "^20.0.0",
     "eslint": "^9.8.0",
@@ -69,6 +75,7 @@
     "jsonc-eslint-parser": "^2.1.0",
     "nx": "21.4.1",
     "prettier": "^2.6.2",
+    "supertest": "^7.1.4",
     "ts-jest": "^29.4.0",
     "ts-node": "10.9.1",
     "tslib": "^2.3.0",

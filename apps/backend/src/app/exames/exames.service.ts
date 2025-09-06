@@ -17,6 +17,7 @@ export class ExamesService {
   ) { }
 
   async create(dto: CreateExameDto): Promise<Exame> {
+
     return await this.dataSource.transaction(async (manager) => {
       // Paciente deve existir
       const paciente = await manager.findOne(this.pacientesRepo.target, {
