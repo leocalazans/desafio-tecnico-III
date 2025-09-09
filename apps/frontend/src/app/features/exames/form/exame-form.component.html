@@ -1,0 +1,34 @@
+<section class="exame-form">
+  <h2>Novo Exame</h2>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Paciente</mat-label>
+      <mat-select formControlName="pacienteId">
+        <mat-option *ngFor="let p of pacientes()" [value]="p.id">{{ p.nome }} — {{ p.documento }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.controls['pacienteId'].hasError('required')">Selecione um paciente</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Modalidade</mat-label>
+      <mat-select formControlName="modalidade">
+        <mat-option *ngFor="let m of modalidades" [value]="m">{{ m }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.controls['modalidade'].hasError('required')">Modalidade obrigatória</mat-error>
+    </mat-form-field>
+
+    <!-- Optional: show current key for retry -->
+    <mat-form-field appearance="outline">
+      <mat-label>Idempotency Key (opcional)</mat-label>
+      <input matInput formControlName="idempotencyKey" />
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-stroked-button routerLink="/exames">Cancelar</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="saving()">Salvar</button>
+    </div>
+
+    <div *ngIf="error()" class="form-error">{{ error() }}</div>
+  </form>
+</section>

@@ -4,6 +4,9 @@ import {
   Body,
   Get,
   Query,
+  Put,
+  Param,
+  NotFoundException,
   ConflictException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
@@ -40,5 +43,29 @@ export class PacientesController {
     @Query('pageSize') pageSize = 10,
   ) {
     return this.pacientesService.findAll(+page, +pageSize);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Retorna um paciente pelo ID' })
+  @ApiResponse({ status: 200, description: 'Paciente retornado com sucesso.' })
+  @ApiResponse({ status: 404, description: 'Paciente não encontrado.' })
+  async findOne(@Param('id') id: string) {
+    const paciente = await this.pacientesService.findOne(id);
+    if (!paciente) throw new NotFoundException('Paciente não encontrado');
+    return paciente;
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Atualiza um paciente pelo ID' })
+  @ApiResponse({ status: 200, description: 'Paciente atualizado com sucesso.' })
+  @ApiResponse({ status: 404, description: 'Paciente não encontrado.' })
+  @ApiResponse({ status: 409, description: 'Documento já cadastrado.' })
+  async update(@Param('id') id: string, @Body() dto: CreatePacienteDto) {
+    try {
+      return await this.pacientesService.update(id, dto);
+    } catch (error) {
+      if (error instanceof ConflictException) throw error;
+      throw error;
+    }
   }
 }

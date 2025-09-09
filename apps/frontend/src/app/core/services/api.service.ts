@@ -1,41 +1,26 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { firstValueFrom, timeout, retryWhen, delay, scan } from 'rxjs';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  private base = '/api'; // ajuste conforme env
   private http = inject(HttpClient);
+  private baseUrl = 'http://localhost:3000/api'; // ajuste conforme proxy Nx ou env
 
-  private defaultPipe<T>(obs$: Observable<T>): Observable<T> {
-    return obs$.pipe(
-      timeout(10000),
-      retryWhen(errors =>
-        errors.pipe(
-          scan((acc, err) => {
-            if (acc >= 2) throw err;
-            return acc + 1;
-          }, 0),
-          delay(300)
-        )
-      )
-    );
+  async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
+    const httpParams = new HttpParams({ fromObject: params ?? {} });
+    return firstValueFrom(this.http.get<T>(`${this.baseUrl}/${endpoint}`, { params: httpParams }));
   }
 
-  get<T>(path: string, params?: any) {
-    return firstValueFrom(
-      this.defaultPipe(
-        this.http.get<T>(`${this.base}${path}`, { params })
-      )
-    );
+  async post<T>(endpoint: string, body: any, headers?: Record<string, string>): Promise<T> {
+    return firstValueFrom(this.http.post<T>(`${this.baseUrl}/${endpoint}`, body, { headers }));
   }
 
-  post<T>(path: string, body: any, headers?: HttpHeaders) {
-    return firstValueFrom(
-      this.defaultPipe(
-        this.http.post<T>(`${this.base}${path}`, body, { headers })
-      )
-    );
+  async put<T>(endpoint: string, body: any): Promise<T> {
+    return firstValueFrom(this.http.put<T>(`${this.baseUrl}/${endpoint}`, body));
+  }
+
+  async delete<T>(endpoint: string): Promise<T> {
+    return firstValueFrom(this.http.delete<T>(`${this.baseUrl}/${endpoint}`));
   }
 }

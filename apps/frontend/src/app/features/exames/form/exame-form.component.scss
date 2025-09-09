@@ -1,0 +1,20 @@
+.exame-form {
+  max-width: 720px;
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .form-error {
+    color: var(--md-sys-color-error);
+    margin-top: 8px;
+  }
+}

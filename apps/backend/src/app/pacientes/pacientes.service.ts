@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { PacientesRepository } from './pacientes.repository';
 import { CreatePacienteDto } from '@project/shared';
 import { DataSource } from 'typeorm';
@@ -37,5 +37,22 @@ export class PacientesService {
     });
 
     return { data, total, page, pageSize };
+  }
+  async findOne(id: string) {
+    const paciente = await this.pacientesRepo.findOneBy({ id });
+    if (!paciente) throw new NotFoundException('Paciente não encontrado');
+    return paciente;
+  }
+
+  async update(id: string, dto: CreatePacienteDto) {
+    const paciente = await this.pacientesRepo.findOneBy({ id });
+    if (!paciente) throw new NotFoundException('Paciente não encontrado');
+
+    // Verificar duplicidade de documento
+    const exists = await this.pacientesRepo.findOneBy({ documento: dto.documento });
+    if (exists && exists.id !== id) throw new ConflictException('Documento já cadastrado');
+
+    Object.assign(paciente, dto);
+    return this.pacientesRepo.save(paciente);
   }
 }

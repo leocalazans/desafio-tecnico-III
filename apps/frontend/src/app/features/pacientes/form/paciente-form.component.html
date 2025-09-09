@@ -1,0 +1,40 @@
+<section class="paciente-form">
+  <h2>Novo Paciente</h2>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Nome</mat-label>
+      <input matInput formControlName="nome" />
+      <mat-error *ngIf="form.controls['nome'].hasError('required')">Nome obrigatório</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Documento</mat-label>
+      <input matInput formControlName="documento" />
+      <mat-error *ngIf="form.controls['documento'].hasError('required')">Documento obrigatório</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" />
+      <mat-error *ngIf="form.controls['email'].hasError('email')">Email inválido</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Data de Nascimento</mat-label>
+      <input matInput type="date" formControlName="dataNascimento" />
+      <mat-error *ngIf="form.controls['dataNascimento'].hasError('required')">Data obrigatória</mat-error>
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-stroked-button type="button" routerLink="/pacientes">Cancelar</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+        Salvar
+      </button>
+    </div>
+
+    <div *ngIf="error()" class="form-error">
+      {{ error() }}
+    </div>
+  </form>
+</section>

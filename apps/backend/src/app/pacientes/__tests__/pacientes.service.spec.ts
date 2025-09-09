@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PacientesService } from '../pacientes.service';
 import { PacientesRepository } from '../pacientes.repository';
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { repoMockFactory } from '../../../../test/utils/repo-mock';
 import { CreatePacienteDto } from '@project/shared';
@@ -157,4 +157,66 @@ describe('PacientesService', () => {
       expect(res.page).toBe(1000);
     });
   });
+
+  describe('findOne', () => {
+    it('retorna paciente existente', async () => {
+      repo.findOneBy.mockResolvedValue({ id: 'uuid-1', nome: 'João', documento: '123' });
+      const paciente = await service.findOne('uuid-1');
+      expect(paciente).toEqual({ id: 'uuid-1', nome: 'João', documento: '123' });
+      expect(repo.findOneBy).toHaveBeenCalledWith({ id: 'uuid-1' });
+    });
+
+    it('lança NotFoundException se paciente não existir', async () => {
+      repo.findOneBy.mockResolvedValue(null);
+      await expect(service.findOne('uuid-999')).rejects.toThrow('Paciente não encontrado');
+    });
+  });
+
+  describe('update', () => {
+    const dto: CreatePacienteDto = { nome: 'João Atualizado', documento: '123', };
+
+    it('atualiza paciente existente com sucesso', async () => {
+      // Mock para encontrar paciente por ID
+      repo.findOneBy
+        .mockResolvedValueOnce({ id: 'uuid-1', nome: 'João', documento: '123' }) // paciente existe
+        .mockResolvedValueOnce(null); // duplicidade não encontrada
+
+      // Mock do save
+      dataSourceMock.transaction.mockImplementationOnce(async (cb) => {
+        const manager = { save: jest.fn().mockResolvedValue({ id: 'uuid-1', ...dto }) };
+        return cb(manager);
+      });
+
+      const res = await service.update('uuid-1', dto as any);
+      expect(res.nome).toBe('João Atualizado');
+    });
+
+    const res = await service.update('uuid-1', dto as any);
+    // expect(res.nome).toBe('João Atualizado');
+  });
+
+  it('lança NotFoundException se paciente não existir', async () => {
+    dataSourceMock.transaction.mockImplementationOnce(async (cb) => {
+      const manager = { findOne: jest.fn().mockResolvedValueOnce(null), save: jest.fn() };
+      return cb(manager);
+    });
+
+    await expect(service.update('uuid-invalido', dto as any)).rejects.toThrow(NotFoundException);
+  });
+
+  it('lança ConflictException se documento duplicado', async () => {
+    dataSourceMock.transaction.mockImplementationOnce(async (cb) => {
+      const manager = {
+        findOne: jest
+          .fn()
+          .mockImplementationOnce(() => ({ id: 'uuid-1', nome: 'João', documento: '123', dataNascimento: '1990-01-01' })) // paciente existe
+          .mockImplementationOnce(() => ({ id: 'uuid-2' })), // duplicidade encontrada
+        save: jest.fn(),
+      };
+      return cb(manager);
+    });
+
+    await expect(service.update('uuid-1', dto as any)).rejects.toThrow(NotFoundException);
+  });
+});
 });

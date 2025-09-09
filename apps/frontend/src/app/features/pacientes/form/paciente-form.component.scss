@@ -1,0 +1,23 @@
+.paciente-form {
+  max-width: 720px;
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .form-error {
+    grid-column: 1 / -1;
+    color: var(--md-sys-color-error, #d32f2f);
+    margin-top: 8px;
+  }
+}

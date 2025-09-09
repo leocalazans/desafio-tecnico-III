@@ -11,7 +11,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
-
+  app.enableCors({
+    origin: 'http://localhost:4200', // frontend
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
   const config = new DocumentBuilder()
     .setTitle('Mobilemed API')
     .setDescription('API para mobilemed')

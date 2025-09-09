@@ -1,0 +1,28 @@
+.exames-list {
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .spinner-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 32px 0;
+  }
+
+  .error-block {
+    border: 1px dashed var(--md-sys-color-error);
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  table {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}

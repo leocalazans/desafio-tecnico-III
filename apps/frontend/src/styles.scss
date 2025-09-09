@@ -1,0 +1,103 @@
+/* =========================
+   Material 3 Expressive Theme
+   ========================= */
+
+/* Import Angular Material core (sem definir paletas antigas) */
+@use '@angular/material' as mat;
+
+/* =========================
+   CSS Custom Properties
+   ========================= */
+:root {
+  /* Primary Colors */
+  --md-sys-color-primary: #6750A4;
+  --md-sys-color-on-primary: #FFFFFF;
+  --md-sys-color-primary-container: #EADDFF;
+  --md-sys-color-on-primary-container: #21005D;
+
+  /* Secondary Colors */
+  --md-sys-color-secondary: #625B71;
+  --md-sys-color-on-secondary: #FFFFFF;
+  --md-sys-color-secondary-container: #E8DEF8;
+  --md-sys-color-on-secondary-container: #1D192B;
+
+  /* Background & Surface */
+  --md-sys-color-background: #FFFBFE;
+  --md-sys-color-on-background: #1C1B1F;
+  --md-sys-color-surface: #FFFBFE;
+  --md-sys-color-on-surface: #1C1B1F;
+
+  /* Error */
+  --md-sys-color-error: #B3261E;
+  --md-sys-color-on-error: #FFFFFF;
+
+  /* Shape / Border radius */
+  --md-sys-shape-small-component-radius: 12px;
+  --md-sys-shape-medium-component-radius: 16px;
+  --md-sys-shape-large-component-radius: 24px;
+
+  /* Typography */
+  --md-sys-typography-body-large-font-family: 'Roboto, sans-serif';
+  --md-sys-typography-body-large-font-size: 1rem;
+  --md-sys-typography-body-large-line-height: 1.5rem;
+}
+
+/* =========================
+   Global Styles
+   ========================= */
+body {
+  font-family: 'Roboto', sans-serif;
+
+  background-color: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+  margin: 0;
+  padding: 0;
+}
+
+/* =========================
+   Angular Material Overrides
+   ========================= */
+mat-toolbar {
+  background-color: var(--md-sys-color-primary) !important;
+  color: var(--md-sys-color-on-primary) !important;
+}
+
+.mat-sidenav {
+  background-color: var(--md-sys-color-surface) !important;
+  color: var(--md-sys-color-on-surface) !important;
+}
+
+.mat-nav-list .mat-list-item {
+  border-radius: var(--md-sys-shape-medium-component-radius);
+  transition: background-color 0.2s;
+}
+
+.mat-nav-list .mat-list-item.active,
+.mat-nav-list .mat-list-item:hover {
+  background-color: rgba(103, 80, 164, 0.1);
+  /* primary tint */
+}
+
+button.mat-raised-button {
+  border-radius: var(--md-sys-shape-small-component-radius);
+}
+
+.mat-icon {
+  vertical-align: middle;
+}
+
+/* =========================
+   Scrollbars (opcional) para dashboard elegante)
+   ========================= */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--md-sys-color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--md-sys-color-primary-container);
+  border-radius: 10px;
+}

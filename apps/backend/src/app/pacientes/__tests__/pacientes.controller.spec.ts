@@ -11,6 +11,8 @@ describe('PacientesController', () => {
   const mockService = {
     create: jest.fn(),
     findAll: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -65,6 +67,50 @@ describe('PacientesController', () => {
       const res = await controller.findAll();
       expect(res.page).toBe(1);
       expect(res.pageSize).toBe(10);
+    });
+  });
+  describe('update', () => {
+    it('atualiza paciente com sucesso', async () => {
+      const dto: CreatePacienteDto = { nome: 'João Atualizado', documento: '1234' };
+      const pacienteId = 'p1';
+      mockService.update = jest.fn().mockResolvedValue({ id: pacienteId, ...dto });
+      const res = await controller.update(pacienteId, dto);
+      expect(res.id).toBe(pacienteId);
+      expect(res.nome).toBe('João Atualizado');
+      expect(mockService.update).toHaveBeenCalledWith(pacienteId, dto);
+    });
+
+    it('lança 409 se serviço lança ConflictException', async () => {
+      const dto = { nome: 'Maria', documento: '123', dataNascimento: '1990-01-01' };
+      const pacienteId = 'p2';
+      mockService.update = jest.fn().mockRejectedValue(new ConflictException('Documento já cadastrado'));
+      await expect(controller.update(pacienteId, dto)).rejects.toThrow(ConflictException);
+    });
+    it('lança erro genérico se serviço lança outro erro', async () => {
+      const dto = { nome: 'Erro', documento: '000', dataNascimento: '2000-01-01' };
+      const pacienteId = 'p3';
+      mockService.update = jest.fn().mockRejectedValue(new Error('Unknown'));
+      await expect(controller.update(pacienteId, dto)).rejects.toThrow('Unknown');
+    });
+  });
+  describe('findOne', () => {
+    it('retorna paciente existente', async () => {
+      const pacienteId = 'p1';
+      const mockPaciente = {
+        id: pacienteId,
+        nome: 'João',
+        documento: '123',
+        email: 'joao@teste.com',
+        dataNascimento: '1990-01-01',
+        exames: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      jest.spyOn(service, 'findOne').mockResolvedValue(mockPaciente as any);
+      const res = await controller.findOne(pacienteId);
+      expect(res).toEqual(mockPaciente);
+      expect(service.findOne).toHaveBeenCalledWith(pacienteId);
     });
   });
 });
